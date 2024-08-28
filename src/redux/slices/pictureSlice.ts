@@ -1,13 +1,22 @@
-import { createSlice } from "@reduxjs/toolkit";
-
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+interface PictureState {
+    picture: string | null;
+  }
+  
+  const initialState: PictureState = {
+    picture: null,
+  };
 const pictureSlice = createSlice({
     name: 'picture',
-    initialState: null,
+    initialState,
     reducers: { 
-        setPicture: (_state, action) => {
-            return action.payload;
-        }
+        setPicture: (state, action: PayloadAction<string>) => {
+            state.picture = action.payload;
+          },
+        clearPicture: (state) => {
+            state.picture = null;
+          },
     }
 })
-export const { setPicture } = pictureSlice.actions;
+export const { setPicture, clearPicture } = pictureSlice.actions;
 export default pictureSlice.reducer;
