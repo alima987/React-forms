@@ -3,14 +3,24 @@ import { useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { setPicture } from "../redux/slices/pictureSlice"
 import { RootState } from "../redux/store"
+import  { schema } from '../components/Validation';
+import * as yup from 'yup';
+import { setUncontrolledFormData } from "../redux/slices/uncontrolled"
 
 const Uncontrolled = () => {
-    const inputRef = useRef<HTMLInputElement>(null)
+    const nameRef = useRef<HTMLInputElement>(null)
+    const ageRef = useRef<HTMLInputElement>(null)
+    const emailRef = useRef<HTMLInputElement>(null)
+    const passwordRef = useRef<HTMLInputElement>(null)
+    const confirmRef = useRef<HTMLInputElement>(null)
+    const acceptRef = useRef<HTMLInputElement>(null)
+    const pictureRef = useRef<HTMLInputElement>(null)
+    const countryRef = useRef<HTMLInputElement>(null)
     const dispatch = useDispatch();
     const countries = useSelector((state: RootState) => state.countries.countries)
     const picture = useSelector((state: RootState) => state.picture.picture)
-    const [filtered, setFiltered] = useState<string[]>([])
-    const [ selected, setSelected]= useState('')
+    const uncontrolledFormData = useSelector((state: RootState) => state.uncontrolledFormData)
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
         const handleLoadPicture = (event: React.ChangeEvent<HTMLInputElement>) => {
           event.preventDefault();
@@ -40,66 +50,155 @@ const Uncontrolled = () => {
             dispatch(setPicture(base64String));
           };
           reader.readAsDataURL(file);
+        };     
+      
+      const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const object = Object.fromEntries(formData);
+
+    try {
+        await schema.validate(object, { abortEarly: false });
+        alert('Form submitted successfully!');
+        console.log(object);
+    } catch (err) {
+        if (err instanceof yup.ValidationError) {
+            const errors: { [key: string]: string } = {};
+            err.inner.forEach((error) => {
+                errors[error.path || ''] = error.message;
+            });
+            setErrors(errors);
+        }
+    }
+      alert(`
+        ${nameRef.current?.value} 
+        ${ageRef.current?.value} 
+        ${emailRef.current?.value} 
+        ${passwordRef.current?.value}
+        ${confirmRef.current?.value}
+        ${uncontrolledFormData.gender}
+        ${acceptRef.current?.value}
+        ${pictureRef.current?.value}
+        ${countryRef.current?.value}`)
+      };
+      const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type, checked } = event.target;
+        console.log(name, value);
+        const updatedData = {
+          ...uncontrolledFormData,
+          [name]: type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) : value,
         };
       
-        const handleCountryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-          const value = event.target.value;
-          setSelected(value)
-          setFiltered(countries.filter((country) => country.toLocaleLowerCase().includes(value.toLocaleLowerCase())))
-        }
-        const handleCountrySelect = (country: string)=> {
-           setSelected(country)
-           setFiltered([])
-        }
-        const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-         event.preventDefault()
-         if (inputRef.current) {
-          alert("Form submitted: " + inputRef.current.value);
-        }
-        }
-
+        dispatch(setUncontrolledFormData(updatedData));
+      };      
+      
 return (
     <div>
         <h2>Uncontrolled</h2>
         <form onSubmit={handleSubmit}>
           <label htmlFor="name">
             <p>Name:</p>
-            <input ref={inputRef} type="text"/>
+            <input 
+            ref={nameRef} 
+            type="text" 
+            name="name" 
+            value={uncontrolledFormData.name} 
+            onChange={handleInputChange}/>
+            {errors.name && <p className="error">{errors.name}</p>}
           </label>
           <label htmlFor="age">
             <p>Age:</p>
-            <input ref={inputRef} type="number" id="age" name="age" min="0" max="120" step="1"/>
+            <input 
+           ref={ageRef}
+           type="number"
+           name="age"
+           id="age"
+           min="0"
+           max="120"
+           step="1"
+           value={uncontrolledFormData.age}
+           onChange={handleInputChange}
+           />
+            {errors.age && <p className="error">{errors.age}</p>}
           </label>
           <label htmlFor="email">
             <p>Email:</p>
-            <input ref={inputRef} type="text"/>
+            <input 
+            ref={emailRef}
+            type="text"
+            name="email"
+            value={uncontrolledFormData.email}
+            onChange={handleInputChange}/>
+            {errors.email && <p className="error">{errors.email}</p>}
           </label>
           <label htmlFor="password">
             <p>Password:</p>
-            <input ref={inputRef} type="password" name="password" required/>
+            <input 
+            ref={passwordRef}
+            type="password"
+            name="password"
+            required
+            value={uncontrolledFormData.password}
+            onChange={handleInputChange}/>
+            {errors.password && <p className="error">{errors.password}</p>}
           </label>
           <label htmlFor="confirm-password">
             <p>Re-enter password:</p>
-            <input ref={inputRef} type="password" name="confirm-password" required/>
+            <input 
+            ref={confirmRef}
+            type="password"
+            name="confirmPassword"
+            required
+            value={uncontrolledFormData.confirmPassword}
+            onChange={handleInputChange}/>
+            {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
           </label>
           <fieldset>
             <legend>Gender:</legend>
             <label htmlFor="male">
-                <input type="radio" name="gender" value="male" required ref={inputRef}/>
+                <input 
+                type="radio"
+                name="gender"
+                value="male"
+                checked={uncontrolledFormData.gender === "male"}
+                onChange={handleInputChange}
+                
+                />
                 <p>Male</p>
             </label>
             <label htmlFor="female">
-                <input type="radio" name="gender" value="female" required ref={inputRef}/>
+              <input 
+              type="radio"
+              name="gender"
+              value="female"
+              checked={uncontrolledFormData.gender === "female"}
+              onChange={handleInputChange}
+              
+              />
                 <p>Female</p>
             </label>
+            {errors.gender && <p className="error">{errors.gender}</p>}
            </fieldset>
            <label htmlFor="accept">
-             <input type="checkbox" name="accept" ref={inputRef}/>
+             <input 
+             type="checkbox"
+             name="accept"
+             checked={uncontrolledFormData.accept}
+             onChange={handleInputChange}
+             ref={acceptRef}/>
              <p>Accept T&C:</p>
+             {errors.accept && <p className="error">{errors.accept}</p>}
            </label>
            <label htmlFor="picture">
               <p>Upload picture</p>
-              <input type="file" id="picture" name="picturer" accept=".jpg, .jpeg, .png" onChange={handleLoadPicture} ref={inputRef}/>
+              <input 
+              type="file"
+              id="picture"
+              name="picture"
+              accept=".jpg, .jpeg, .png"
+              onChange={handleLoadPicture}
+              ref={pictureRef}/>
+              {errors.picture && <p className="error">{errors.picture}</p>}
               {picture && (
                 <div >
                  <img src={picture} alt="Uploaded" style={{maxWidth: "200px", maxHeight: "200px" }}/>
@@ -110,19 +209,18 @@ return (
             <p>Countries</p>
             <input 
             type="text"
-            value={selected}
-            onChange={handleCountryChange}
-            ref={inputRef}
+            value={uncontrolledFormData.country}
+            name="country"
+            onChange={handleInputChange}
+            ref={countryRef}
+            list="countriesList"
             />
-            {filtered.length > 0 && (
-              <ul>
-                {filtered.map((country, inx) => (
-                  <li key={inx} onClick={() => handleCountrySelect(country)}>
-                    {country}
-                  </li>
-                ))}
-              </ul>
-            )}
+             {errors.country && <p className="error">{errors.country}</p>}
+            <datalist id="countriesList">
+            {countries.map((country) => (
+              <option key={country} value={country} />
+            ))}
+          </datalist>
            </label>
            <button type="submit">Submit</button>
         </form>
