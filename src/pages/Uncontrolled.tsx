@@ -6,6 +6,7 @@ import { RootState } from "../redux/store"
 import  { schema } from '../components/Validation';
 import * as yup from 'yup';
 import { setUncontrolledFormData } from "../redux/slices/uncontrolled"
+import { useNavigate } from "react-router-dom"
 
 const Uncontrolled = () => {
     const nameRef = useRef<HTMLInputElement>(null)
@@ -13,10 +14,10 @@ const Uncontrolled = () => {
     const emailRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
     const confirmRef = useRef<HTMLInputElement>(null)
-    const acceptRef = useRef<HTMLInputElement>(null)
     const pictureRef = useRef<HTMLInputElement>(null)
     const countryRef = useRef<HTMLInputElement>(null)
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const countries = useSelector((state: RootState) => state.countries.countries)
     const picture = useSelector((state: RootState) => state.picture.picture)
     const uncontrolledFormData = useSelector((state: RootState) => state.uncontrolledFormData)
@@ -53,14 +54,13 @@ const Uncontrolled = () => {
         };     
       
       const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const object = Object.fromEntries(formData);
-
+        e.preventDefault();        
     try {
-        await schema.validate(object, { abortEarly: false });
+        await schema.validate(uncontrolledFormData, { abortEarly: false });
+        dispatch(setUncontrolledFormData(uncontrolledFormData));
         alert('Form submitted successfully!');
-        console.log(object);
+        navigate('/');
+        console.log(uncontrolledFormData);
     } catch (err) {
         if (err instanceof yup.ValidationError) {
             const errors: { [key: string]: string } = {};
@@ -77,13 +77,13 @@ const Uncontrolled = () => {
         ${passwordRef.current?.value}
         ${confirmRef.current?.value}
         ${uncontrolledFormData.gender}
-        ${acceptRef.current?.value}
+        ${uncontrolledFormData.accept}
         ${pictureRef.current?.value}
         ${countryRef.current?.value}`)
       };
       const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = event.target;
-        console.log(name, value);
+        console.log(name, value, checked);
         const updatedData = {
           ...uncontrolledFormData,
           [name]: type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) : value,
@@ -91,6 +91,7 @@ const Uncontrolled = () => {
       
         dispatch(setUncontrolledFormData(updatedData));
       };      
+      console.log('Uncontrolled Form Data:', uncontrolledFormData);
       
 return (
     <div>
@@ -183,9 +184,10 @@ return (
              <input 
              type="checkbox"
              name="accept"
+             value='accept'
              checked={uncontrolledFormData.accept}
              onChange={handleInputChange}
-             ref={acceptRef}/>
+              />
              <p>Accept T&C:</p>
              {errors.accept && <p className="error">{errors.accept}</p>}
            </label>

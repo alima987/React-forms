@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface PictureState {
-    picture: string | null;
+    picture: string | null; 
   }
   
   const initialState: PictureState = {

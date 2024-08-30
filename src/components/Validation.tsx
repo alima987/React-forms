@@ -17,3 +17,6 @@ export const schema = yup.object().shape({
     .required('Picture is required'),
     country: yup.string().required('Country selection is required'),
     })
+
+
+
