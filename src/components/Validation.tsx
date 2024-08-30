@@ -11,8 +11,7 @@ export const schema = yup.object().shape({
     confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Confirm Password is required'),
     gender: yup.mixed().defined().required('Gender is required'),
     accept: yup.boolean().required("Required").oneOf([true], "You must accept the terms"),
-    picture: yup.mixed<File>()
-    .required('Picture is required'),
+    picture: yup.mixed<File>().required('Picture is required'),
     country: yup.string().required('Country selection is required'),
     })
 

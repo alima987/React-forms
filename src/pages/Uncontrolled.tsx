@@ -1,11 +1,11 @@
 import React, { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setPicture } from "../redux/slices/pictureSlice";
+import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { schema } from '../components/Validation';
 import * as yup from 'yup';
 import { useNavigate } from "react-router-dom";
 import { FormData } from "../types";
+import { useLoadPicture } from "../utils/loadPicture";
 
 const Uncontrolled = () => {
     const nameRef = useRef<HTMLInputElement>(null);
@@ -17,45 +17,11 @@ const Uncontrolled = () => {
     const acceptRef = useRef<HTMLInputElement>(null);
     const pictureRef = useRef<HTMLInputElement>(null);
     const countryRef = useRef<HTMLInputElement>(null);
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const countries = useSelector((state: RootState) => state.countries.countries);
     const picture = useSelector((state: RootState) => state.picture.picture);
+    const handleLoadPicture = useLoadPicture();
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-    const handleLoadPicture = (event: React.ChangeEvent<HTMLInputElement>) => {
-      event.preventDefault();
-      const file = event.target.files?.[0];
-      console.log('File type:', file?.type);
-  
-      if (!file) {
-        alert("No file selected");
-        return;
-      }
-      console.log('Selected file:', file);
-      console.log('File size:', file.size);
-      console.log('File type:', file.type);
-      const maxSizeMB = 5;
-      const maxSizeBytes = maxSizeMB * 1024 * 1024;
-      if (file.size > maxSizeBytes) {
-        alert(`File size should be less than ${maxSizeMB}MB`);
-        return;
-      }
-
-      const allowedExtensions = ["image/jpeg", "image/png"];
-      if (!allowedExtensions.includes(file.type)) {
-        alert("Invalid file type. Only JPG and PNG files are allowed.");
-        return;
-      }
-  
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        console.log('File data URL:', base64String);
-        dispatch(setPicture(base64String));
-      };
-      reader.readAsDataURL(file);
-    };   
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -73,7 +39,6 @@ const Uncontrolled = () => {
         };
         try {
             await schema.validate(formData, { abortEarly: false });
-            alert('Form submitted successfully!');
             navigate('/', { state: { formData } });
         } catch (err) {
             if (err instanceof yup.ValidationError) {
@@ -87,7 +52,7 @@ const Uncontrolled = () => {
     };
     return (
         <div>
-            <h2>Uncontrolled</h2>
+            <h2>Uncontrolled Form</h2>
             <form onSubmit={handleSubmit}>
                 <label htmlFor="name">
                     <p>Name:</p>
