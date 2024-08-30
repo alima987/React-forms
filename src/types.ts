@@ -4,7 +4,7 @@ export interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
-  gender: string
+  gender: string;
   accept: boolean;
   picture: string;
   country: string;

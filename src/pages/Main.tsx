@@ -1,27 +1,34 @@
 
 import { useSelector } from "react-redux"
 import { RootState } from "../redux/store"
+import { useLocation } from "react-router-dom";
 
 const Main = () => {
-const uncontrolledFormData = useSelector((state: RootState) => state.uncontrolledFormData)
-const picture = useSelector((state: RootState) => state.picture.picture);
+    const location = useLocation();
+    const formData = location.state?.formData;
+    const picture = useSelector((state: RootState) => state.picture.picture);
 return (
     <div>
     <h2>Main Page</h2>
-    <div>
-        <h3>Form Responses:</h3>
-        <p><strong>Name:</strong> {uncontrolledFormData.name}</p>
-        <p><strong>Age:</strong> {uncontrolledFormData.age}</p>
-        <p><strong>Email:</strong> {uncontrolledFormData.email}</p>
-        <p><strong>Password:</strong> {uncontrolledFormData.password}</p>
-        <p><strong>Confirm Password:</strong> {uncontrolledFormData.confirmPassword}</p>
-        <p><strong>Gender:</strong> {uncontrolledFormData.gender}</p>
-        <p><strong>Accept T&C:</strong> {uncontrolledFormData.accept ? 'Yes' : 'No'}</p>
-        <p><strong>Country:</strong> {uncontrolledFormData.country}</p>
-        {picture && (
-            <div>
-                <img src={picture} alt="Uploaded" style={{ maxWidth: "200px", maxHeight: "200px" }} />
+    <div style={{ marginBottom: "20px" }}>
+        <h3>Form Data:</h3>
+        {formData ? (
+            <div style={{ border: "1px solid #ddd", padding: "10px", borderRadius: "5px" }}>
+                <p><strong>Name:</strong> {formData.name}</p>
+                <p><strong>Age:</strong> {formData.age}</p>
+                <p><strong>Email:</strong> {formData.email}</p>
+                <p><strong>Gender:</strong> {formData.gender}</p>
+                <p><strong>Accept T&C:</strong> {formData.accept ? 'yes' : 'no'}</p>
+                <p><strong>Country:</strong> {formData.country}</p>
+                {picture && (
+        <div style={{ marginTop: "20px" }}>
+            <h3>Stored Picture from Redux:</h3>
+            <img src={picture} alt="Stored" style={{ maxWidth: "200px", maxHeight: "200px" }} />
+        </div>
+    )}
             </div>
+        ) : (
+            <p>No form data available.</p>
         )}
     </div>
 </div>
