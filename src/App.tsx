@@ -3,7 +3,7 @@ import './App.css';
 import Main from './pages/Main';
 import Uncontrolled from './pages/Uncontrolled';
 import ReactHookForm from './pages/ReactHookForm';
-import Header from './components/Header';
+import Header from './components/Header/Header';
 
 function App() {
   return (
