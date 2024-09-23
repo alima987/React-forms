@@ -10,3 +10,21 @@
 .error {
     color: rgb(202, 9, 9);
 }
+html, body {
+    height: 100%;
+    margin: 0;
+}
+#root  {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+main {
+    flex: 1;
+}
+footer {
+    background-color: #2d3748;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
